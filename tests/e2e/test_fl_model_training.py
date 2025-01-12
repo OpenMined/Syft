@@ -9,7 +9,7 @@ from loguru import logger
 
 from tests.e2e.conftest import Client, E2EContext, Server
 
-PROJECT_NAME = "my_cool_fl_project"
+PROJECT_NAME = "FedMNIST"
 
 AGGREGATOR_CONFIG = {
     "project_name": PROJECT_NAME,
@@ -106,12 +106,17 @@ async def approve_data_request(e2e_client: E2EContext, client: Client):
 
     # Approve request
     # Approve action is moving project dir to running dir
-    shutil.copytree(project_dir, running_dir / PROJECT_NAME, dirs_exist_ok=True)
-    shutil.rmtree(project_dir)
+    shutil.move(project_dir, running_dir)
 
-    # Wait for fl_config.json to be copied
+    # Ensure fl_config.json is present in running dir
     await e2e_client.wait_for_path(
         running_dir / PROJECT_NAME / "fl_config.json",
+        timeout=90,
+    )
+    
+    # Ensure model_arch is present in running dir
+    await e2e_client.wait_for_path(
+        running_dir / PROJECT_NAME / AGGREGATOR_CONFIG["model_arch"],
         timeout=90,
     )
 
