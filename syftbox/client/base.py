@@ -1,14 +1,17 @@
 from __future__ import annotations
+from syftbox import __version__
 
+from packaging import version
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
 import httpx
 from typing_extensions import Protocol
 
-from syftbox.client.exceptions import SyftAuthenticationError, SyftPermissionError, SyftServerError
+from syftbox.client.exceptions import SyftAuthenticationError, SyftPermissionError, SyftServerError, SyftServerTooOld
 from syftbox.lib.client_config import SyftClientConfig
-from syftbox.lib.http import HEADER_SYFTBOX_USER, SYFTBOX_HEADERS
+from syftbox.lib.http import HEADER_SYFTBOX_USER, HEADER_SYFTBOX_VERSION, SYFTBOX_HEADERS
+from syftbox.lib.version_utils import get_range_for_version
 from syftbox.lib.workspace import SyftWorkspace
 
 
@@ -90,7 +93,18 @@ class ClientBase:
             raise SyftPermissionError(f"No permission to access this resource: {response.text}")
         elif response.status_code != 200:
             raise SyftServerError(f"[{endpoint}] Server returned {response.status_code}: {response.text}")
+        print(response.headers)
+        print(response.status_code)
+        server_version = response.headers.get(HEADER_SYFTBOX_VERSION)
 
+        version_range = get_range_for_version(server_version)
+        lower_bound_version = version_range[0]
+        upper_bound_version = version_range[1]
+
+        if len(upper_bound_version) > 0 and version.parse(upper_bound_version) < version.parse(__version__):
+            raise SyftServerTooOld(f"Server version is {server_version} and can only work with clients between \
+                                    {lower_bound_version} and {upper_bound_version}. Your client has version {__version__}.")
+            
     @staticmethod
     def _make_headers(config: SyftClientConfig) -> dict:
         headers = {

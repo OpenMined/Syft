@@ -6,13 +6,15 @@ from rich import print as rprint
 from rich.prompt import Prompt
 
 from syftbox.lib.client_config import SyftClientConfig
+from syftbox.lib.http import HEADER_SYFTBOX_VERSION
+from syftbox import __version__
 
 
 def has_valid_access_token(conf: SyftClientConfig, auth_client: httpx.Client) -> bool:
     """Returns True if conf has a valid access token that matches the email in the config."""
     if not conf.access_token:
         return False
-    response = auth_client.post("/auth/whoami", headers={"Authorization": f"Bearer {conf.access_token}"})
+    response = auth_client.post("/auth/whoami", headers={"Authorization": f"Bearer {conf.access_token}", HEADER_SYFTBOX_VERSION: __version__})
     if response.status_code == 401:
         rprint("[red]Invalid access token, re-authenticating.[/red]")
         return False
@@ -41,7 +43,7 @@ def request_email_token(auth_client: httpx.Client, conf: SyftClientConfig) -> Op
     Returns:
         Optional[str]: email token if auth is disabled, None if auth is enabled
     """
-    response = auth_client.post("/auth/request_email_token", json={"email": conf.email})
+    response = auth_client.post("/auth/request_email_token", json={"email": conf.email}, headers={HEADER_SYFTBOX_VERSION: __version__})
     response.raise_for_status()
     return response.json().get("email_token", None)
 
@@ -69,7 +71,7 @@ def get_access_token(
 
     response = auth_client.post(
         "/auth/validate_email_token",
-        headers={"Authorization": f"Bearer {email_token}"},
+        headers={"Authorization": f"Bearer {email_token}", HEADER_SYFTBOX_VERSION: __version__},
         params={"email": conf.email},
     )
 

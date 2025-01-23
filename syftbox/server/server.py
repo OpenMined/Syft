@@ -35,7 +35,7 @@ from syftbox.lib.lib import (
 )
 from syftbox.server.analytics import log_analytics_event
 from syftbox.server.logger import setup_logger
-from syftbox.server.middleware import LoguruMiddleware, RequestSizeLimitMiddleware
+from syftbox.server.middleware import LoguruMiddleware, RequestSizeLimitMiddleware, VersionCheckMiddleware
 from syftbox.server.settings import ServerSettings, get_server_settings
 from syftbox.server.telemetry import (
     OTEL_ATTR_CLIENT_OS_ARCH,
@@ -106,6 +106,7 @@ app.include_router(users_router)
 app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
 app.add_middleware(LoguruMiddleware)
 app.add_middleware(RequestSizeLimitMiddleware)
+app.add_middleware(VersionCheckMiddleware)
 
 FastAPIInstrumentor.instrument_app(app, server_request_hook=server_request_hook)
 SQLite3Instrumentor().instrument()
