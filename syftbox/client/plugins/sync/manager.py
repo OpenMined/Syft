@@ -22,7 +22,7 @@ class SyncManager:
         self.producer = SyncProducer(context=self.context, queue=self.queue, local_state=self.local_state)
         self.consumer = SyncConsumer(context=self.context, queue=self.queue, local_state=self.local_state)
 
-        self.sync_interval = 1  # seconds
+        self.sync_interval = 0.0001  # seconds
         self.thread: Optional[Thread] = None
         self.is_stop_requested = False
         self.sync_run_once = False
