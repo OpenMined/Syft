@@ -28,7 +28,7 @@ dependencies = [
     "curl-cffi>=0.7.4",
     "opentelemetry-instrumentation-fastapi==0.50b0",
     "opentelemetry-instrumentation-sqlite3==0.50b0",
-    "opentelemetry-exporter-otlp-proto-grpc==1.29.0",
+    "opentelemetry-exporter-otlp-proto-grpc==1.30.0",
     "distro==1.9.0",
     "textual>=1.0.0",
     "msgpack>=1.1.0",
