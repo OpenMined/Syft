@@ -13,7 +13,7 @@ dependencies = [
     "pydantic-settings==2.7.1",
     "httpx==0.28.1",
     "pyyaml==6.0.2",
-    "psutil==6.1.1",
+    "psutil==7.0.0",
     "loguru==0.7.3",
     "py-fast-rsync==0.1.0",
     "pathspec==0.12.1",
